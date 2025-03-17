@@ -4,7 +4,7 @@ import 'user.dart';
 import 'book.dart';
 import 'book_page.dart';
 import 'bookmark.dart';
-import 'category.dart';
+import 'category.dart' as app_models; // Use a prefix to avoid conflict
 import '../services/api_service.dart';
 
 class AppState with ChangeNotifier {
@@ -12,14 +12,14 @@ class AppState with ChangeNotifier {
   
   User? _currentUser;
   List<Book> _books = [];
-  List<Category> _categories = [];
+  List<app_models.Category> _categories = []; // Use the prefix
   List<Bookmark> _bookmarks = [];
   Map<int, List<BookPage>> _bookPages = {}; // Cache for book pages
   bool _isLoading = false;
 
   User? get currentUser => _currentUser;
   List<Book> get books => _books;
-  List<Category> get categories => _categories;
+  List<app_models.Category> get categories => _categories; // Use the prefix
   List<Bookmark> get bookmarks => _bookmarks;
   bool get isLoading => _isLoading;
 

@@ -6,7 +6,7 @@ import '../models/user.dart';
 import '../models/book.dart';
 import '../models/book_page.dart';
 import '../models/bookmark.dart';
-import '../models/category.dart';
+import '../models/category.dart' as app_models; // Use a prefix to avoid conflict
 
 class ApiService {
   static const String baseUrl = 'https://api.example.com'; // Mock base URL
@@ -332,17 +332,17 @@ class ApiService {
   }
   
   // Get categories
-  Future<List<Category>> getCategories() async {
+  Future<List<app_models.Category>> getCategories() async {
     if (_isMockEnabled) {
       await Future.delayed(const Duration(seconds: 1)); // Simulate network delay
       
       // Mock categories data
       return [
-        Category(name: 'Adventure', color: 0xFFFF9800),
-        Category(name: 'Fantasy', color: 0xFF4CAF50),
-        Category(name: 'Animals', color: 0xFF2196F3),
-        Category(name: 'Bedtime', color: 0xFF9C27B0),
-        Category(name: 'Educational', color: 0xFFE91E63),
+        app_models.Category(name: 'Adventure', color: 0xFFFF9800),
+        app_models.Category(name: 'Fantasy', color: 0xFF4CAF50),
+        app_models.Category(name: 'Animals', color: 0xFF2196F3),
+        app_models.Category(name: 'Bedtime', color: 0xFF9C27B0),
+        app_models.Category(name: 'Educational', color: 0xFFE91E63),
       ];
     }
     
@@ -354,7 +354,7 @@ class ApiService {
     
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
-      return data.map((json) => Category.fromJson(json)).toList();
+      return data.map((json) => app_models.Category.fromJson(json)).toList();
     } else {
       throw Exception('Failed to load categories: ${response.body}');
     }

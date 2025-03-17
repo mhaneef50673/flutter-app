@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/app_state.dart';
 import '../models/book.dart';
-import '../models/category.dart';
+import '../models/category.dart' as app_models;
 import '../widgets/book_card.dart';
 import '../widgets/category_card.dart';
 import '../widgets/loading_indicator.dart';
@@ -22,7 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     // Ensure data is loaded
-    WidgetsBinding.instance!.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       final appState = Provider.of<AppState>(context, listen: false);
       if (appState.books.isEmpty || appState.categories.isEmpty) {
         appState.fetchInitialData();
@@ -37,7 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _openCategoryBooks(Category category) {
+  void _openCategoryBooks(app_models.Category category) {
     Navigator.of(context).pushNamed(
       '/book-list',
       arguments: category,
