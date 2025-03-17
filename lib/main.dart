@@ -7,7 +7,9 @@ import 'screens/book_list_screen.dart';
 import 'screens/book_detail_screen.dart';
 import 'screens/reader_screen.dart';
 import 'screens/bookmarks_screen.dart';
+import 'screens/profile_screen.dart'; // New profile screen
 import 'models/app_state.dart';
+import 'widgets/main_navigation.dart'; // New navigation widget
 
 void main() {
   runApp(
@@ -46,11 +48,12 @@ class MyApp extends StatelessWidget {
       routes: {
         '/splash': (context) => const SplashScreen(),
         '/login': (context) => const LoginScreen(),
-        '/home': (context) => const HomeScreen(),
+        '/home': (context) => const MainNavigation(), // Use the new navigation widget
         '/book-list': (context) => const BookListScreen(),
         '/book-detail': (context) => const BookDetailScreen(),
         '/reader': (context) => const ReaderScreen(),
         '/bookmarks': (context) => const BookmarksScreen(),
+        '/profile': (context) => const ProfileScreen(), // Add profile screen route
       },
     );
   }

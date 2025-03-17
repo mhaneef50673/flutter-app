@@ -33,19 +33,26 @@ class BookCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            AspectRatio(
-              aspectRatio: 3 / 2,
-              child: Image.network(
-                book.coverImageUrl,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    color: Colors.grey[300],
-                    child: const Center(
-                      child: Icon(Icons.broken_image, size: 40),
-                    ),
-                  );
-                },
+            Expanded(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                ),
+                child: Image.network(
+                  book.coverImageUrl,
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  height: double.infinity,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Center(
+                      child: Icon(
+                        Icons.book,
+                        size: 40,
+                        color: Colors.grey[600],
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
             Padding(
@@ -83,8 +90,8 @@ class BookCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 120,
-        margin: const EdgeInsets.only(right: 12),
+        width: 140, // Increased width
+        margin: const EdgeInsets.only(right: 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -96,17 +103,21 @@ class BookCard extends StatelessWidget {
               ),
               child: AspectRatio(
                 aspectRatio: 2 / 3,
-                child: Image.network(
-                  book.coverImageUrl,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      color: Colors.grey[300],
-                      child: const Center(
-                        child: Icon(Icons.broken_image, size: 24),
-                      ),
-                    );
-                  },
+                child: Container(
+                  color: Colors.grey[300],
+                  child: Image.network(
+                    book.coverImageUrl,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Center(
+                        child: Icon(
+                          Icons.book,
+                          size: 40,
+                          color: Colors.grey[600],
+                        ),
+                      );
+                    },
+                  ),
                 ),
               ),
             ),

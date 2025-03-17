@@ -6,7 +6,7 @@ import '../models/user.dart';
 import '../models/book.dart';
 import '../models/book_page.dart';
 import '../models/bookmark.dart';
-import '../models/category.dart' as app_models; // Use a prefix to avoid conflict
+import '../models/category.dart' as app_models;
 
 class ApiService {
   static const String baseUrl = 'https://api.example.com'; // Mock base URL
@@ -126,14 +126,14 @@ class ApiService {
     if (_isMockEnabled) {
       await Future.delayed(const Duration(seconds: 2)); // Simulate network delay
       
-      // Mock books data
+      // Mock books data with better placeholder URLs
       return [
         Book(
           id: 1,
           title: 'The Magic Forest',
           author: 'Jane Smith',
           category: 'Adventure',
-          coverImageUrl: 'https://via.placeholder.com/150/FF9800/FFFFFF?text=Magic+Forest',
+          coverImageUrl: 'https://picsum.photos/seed/book1/300/450',
           description: 'Join Lucy on her adventure through the magical forest where she meets talking animals and discovers hidden treasures.',
           isFeatured: true,
         ),
@@ -142,7 +142,7 @@ class ApiService {
           title: 'Dragon\'s Tale',
           author: 'Michael Johnson',
           category: 'Fantasy',
-          coverImageUrl: 'https://via.placeholder.com/150/4CAF50/FFFFFF?text=Dragon+Tale',
+          coverImageUrl: 'https://picsum.photos/seed/book2/300/450',
           description: 'A young dragon learns to breathe fire and finds his place in the dragon community.',
           isFeatured: true,
         ),
@@ -151,7 +151,7 @@ class ApiService {
           title: 'Fluffy\'s Adventure',
           author: 'Sarah Williams',
           category: 'Animals',
-          coverImageUrl: 'https://via.placeholder.com/150/2196F3/FFFFFF?text=Fluffy',
+          coverImageUrl: 'https://picsum.photos/seed/book3/300/450',
           description: 'Fluffy the cat gets lost in the big city and must find his way back home.',
           isFeatured: false,
         ),
@@ -160,7 +160,7 @@ class ApiService {
           title: 'Bedtime for Teddy',
           author: 'Emma Thompson',
           category: 'Bedtime',
-          coverImageUrl: 'https://via.placeholder.com/150/9C27B0/FFFFFF?text=Teddy',
+          coverImageUrl: 'https://picsum.photos/seed/book4/300/450',
           description: 'Teddy the bear doesn\'t want to go to sleep and comes up with many excuses to stay awake.',
           isFeatured: false,
         ),
@@ -169,7 +169,7 @@ class ApiService {
           title: 'Counting with Monkeys',
           author: 'David Brown',
           category: 'Educational',
-          coverImageUrl: 'https://via.placeholder.com/150/E91E63/FFFFFF?text=Counting',
+          coverImageUrl: 'https://picsum.photos/seed/book5/300/450',
           description: 'Learn to count from 1 to 10 with the help of playful monkeys.',
           isFeatured: true,
         ),
@@ -224,7 +224,7 @@ class ApiService {
     if (_isMockEnabled) {
       await Future.delayed(const Duration(seconds: 1)); // Simulate network delay
       
-      // Mock book pages based on book ID
+      // Mock book pages based on book ID with better placeholder URLs
       if (bookId == 1) {
         return [
           BookPage(
@@ -232,56 +232,56 @@ class ApiService {
             bookId: 1,
             pageNumber: 1,
             text: 'Once upon a time, there was a little girl named Lucy who lived at the edge of a magical forest.',
-            imageUrl: 'https://via.placeholder.com/400/FF9800/FFFFFF?text=Page+1',
+            imageUrl: 'https://picsum.photos/seed/page1/600/400',
           ),
           BookPage(
             id: 2,
             bookId: 1,
             pageNumber: 2,
             text: 'One day, Lucy decided to explore the forest despite her parents\' warnings.',
-            imageUrl: 'https://via.placeholder.com/400/FF9800/FFFFFF?text=Page+2',
+            imageUrl: 'https://picsum.photos/seed/page2/600/400',
           ),
           BookPage(
             id: 3,
             bookId: 1,
             pageNumber: 3,
             text: 'As she walked deeper into the forest, the trees seemed to whisper her name.',
-            imageUrl: 'https://via.placeholder.com/400/FF9800/FFFFFF?text=Page+3',
+            imageUrl: 'https://picsum.photos/seed/page3/600/400',
           ),
           BookPage(
             id: 4,
             bookId: 1,
             pageNumber: 4,
             text: 'Suddenly, she came across a talking rabbit who introduced himself as Mr. Whiskers.',
-            imageUrl: 'https://via.placeholder.com/400/FF9800/FFFFFF?text=Page+4',
+            imageUrl: 'https://picsum.photos/seed/page4/600/400',
           ),
           BookPage(
             id: 5,
             bookId: 1,
             pageNumber: 5,
             text: 'Mr. Whiskers offered to guide Lucy through the magical forest.',
-            imageUrl: 'https://via.placeholder.com/400/FF9800/FFFFFF?text=Page+5',
+            imageUrl: 'https://picsum.photos/seed/page5/600/400',
           ),
           BookPage(
             id: 6,
             bookId: 1,
             pageNumber: 6,
             text: 'They encountered many magical creatures and had wonderful adventures.',
-            imageUrl: 'https://via.placeholder.com/400/FF9800/FFFFFF?text=Page+6',
+            imageUrl: 'https://picsum.photos/seed/page6/600/400',
           ),
           BookPage(
             id: 7,
             bookId: 1,
             pageNumber: 7,
             text: 'When it was time to go home, Lucy promised to visit her new friends again.',
-            imageUrl: 'https://via.placeholder.com/400/FF9800/FFFFFF?text=Page+7',
+            imageUrl: 'https://picsum.photos/seed/page7/600/400',
           ),
           BookPage(
             id: 8,
             bookId: 1,
             pageNumber: 8,
             text: 'The End.',
-            imageUrl: 'https://via.placeholder.com/400/FF9800/FFFFFF?text=The+End',
+            imageUrl: 'https://picsum.photos/seed/page8/600/400',
           ),
         ];
       } else if (bookId == 2) {
@@ -291,14 +291,14 @@ class ApiService {
             bookId: 2,
             pageNumber: 1,
             text: 'In a land of dragons, a young dragon named Spark couldn\'t breathe fire.',
-            imageUrl: 'https://via.placeholder.com/400/4CAF50/FFFFFF?text=Page+1',
+            imageUrl: 'https://picsum.photos/seed/dragon1/600/400',
           ),
           BookPage(
             id: 10,
             bookId: 2,
             pageNumber: 2,
             text: 'All the other dragons could breathe magnificent flames, but not Spark.',
-            imageUrl: 'https://via.placeholder.com/400/4CAF50/FFFFFF?text=Page+2',
+            imageUrl: 'https://picsum.photos/seed/dragon2/600/400',
           ),
           // Add more pages for book 2
         ];
@@ -311,7 +311,7 @@ class ApiService {
             bookId: bookId,
             pageNumber: index + 1,
             text: 'This is page ${index + 1} of book $bookId.',
-            imageUrl: 'https://via.placeholder.com/400/2196F3/FFFFFF?text=Book+$bookId+Page+${index + 1}',
+            imageUrl: 'https://picsum.photos/seed/book${bookId}page${index+1}/600/400',
           ),
         );
       }

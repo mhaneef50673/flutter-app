@@ -15,9 +15,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  int _currentNavIndex = 0;
-
   @override
   void initState() {
     super.initState();
@@ -44,20 +41,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _onNavItemTapped(int index) {
-    setState(() {
-      _currentNavIndex = index;
-    });
-    
-    if (index == 0) {
-      // Already on home
-    } else if (index == 1) {
-      // Show categories - could be implemented as a separate screen
-    } else if (index == 2) {
-      Navigator.of(context).pushNamed('/bookmarks');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
@@ -67,72 +50,9 @@ class _HomeScreenState extends State<HomeScreen> {
     final categories = appState.categories;
 
     return Scaffold(
-      key: _scaffoldKey,
       appBar: AppBar(
         title: const Text('Children\'s Book App'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.bookmark),
-            onPressed: () {
-              Navigator.of(context).pushNamed('/bookmarks');
-            },
-          ),
-        ],
-      ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            UserAccountsDrawerHeader(
-              accountName: Text(user?.username ?? 'Guest'),
-              accountEmail: Text(user?.email ?? ''),
-              currentAccountPicture: CircleAvatar(
-                backgroundColor: Colors.white,
-                child: Text(
-                  user?.username.substring(0, 1).toUpperCase() ?? 'G',
-                  style: const TextStyle(fontSize: 24),
-                ),
-              ),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary,
-              ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.home),
-              title: const Text('Home'),
-              selected: true,
-              onTap: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.category),
-              title: const Text('Categories'),
-              onTap: () {
-                Navigator.of(context).pop();
-                // Show all categories
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.bookmark),
-              title: const Text('Bookmarks'),
-              onTap: () {
-                Navigator.of(context).pop();
-                Navigator.of(context).pushNamed('/bookmarks');
-              },
-            ),
-            const Divider(),
-            ListTile(
-              leading: const Icon(Icons.logout),
-              title: const Text('Logout'),
-              onTap: () {
-                Navigator.of(context).pop();
-                appState.logout();
-                Navigator.of(context).pushReplacementNamed('/login');
-              },
-            ),
-          ],
-        ),
+        centerTitle: true,
       ),
       body: isLoading
           ? const LoadingIndicator()
@@ -184,7 +104,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     const SizedBox(height: 16),
                     SizedBox(
-                      height: 220,
+                      height: 240, // Increased height to avoid overflow
                       child: ListView.builder(
                         scrollDirection: Axis.horizontal,
                         itemCount: featuredBooks.length,
@@ -210,7 +130,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       physics: const NeverScrollableScrollPhysics(),
                       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
-                        childAspectRatio: 0.75,
+                        childAspectRatio: 0.7, // Adjusted for better proportions
                         crossAxisSpacing: 10,
                         mainAxisSpacing: 10,
                       ),
@@ -226,24 +146,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentNavIndex,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.category),
-            label: 'Categories',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.bookmark),
-            label: 'Bookmarks',
-          ),
-        ],
-        onTap: _onNavItemTapped,
-      ),
     );
   }
 }
