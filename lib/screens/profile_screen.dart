@@ -52,59 +52,6 @@ class ProfileScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 32),
                   const Divider(),
-                  _buildProfileOption(
-                    context,
-                    'Account Settings',
-                    Icons.settings,
-                    () {
-                      // Navigate to account settings
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Account Settings - Not implemented in demo'),
-                        ),
-                      );
-                    },
-                  ),
-                  _buildProfileOption(
-                    context,
-                    'Reading History',
-                    Icons.history,
-                    () {
-                      // Navigate to reading history
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Reading History - Not implemented in demo'),
-                        ),
-                      );
-                    },
-                  ),
-                  _buildProfileOption(
-                    context,
-                    'Notifications',
-                    Icons.notifications,
-                    () {
-                      // Navigate to notifications settings
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Notifications - Not implemented in demo'),
-                        ),
-                      );
-                    },
-                  ),
-                  _buildProfileOption(
-                    context,
-                    'Help & Support',
-                    Icons.help,
-                    () {
-                      // Navigate to help & support
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Help & Support - Not implemented in demo'),
-                        ),
-                      );
-                    },
-                  ),
-                  const Divider(),
                   const SizedBox(height: 16),
                   SizedBox(
                     width: double.infinity,
@@ -134,26 +81,6 @@ class ProfileScreen extends StatelessWidget {
                 ],
               ),
             ),
-    );
-  }
-
-  Widget _buildProfileOption(
-    BuildContext context,
-    String title,
-    IconData icon,
-    VoidCallback onTap,
-  ) {
-    return ListTile(
-      leading: Icon(
-        icon,
-        color: Theme.of(context).colorScheme.primary,
-      ),
-      title: Text(
-        title,
-        style: Theme.of(context).textTheme.titleMedium,
-      ),
-      trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-      onTap: onTap,
     );
   }
 }

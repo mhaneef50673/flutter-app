@@ -41,16 +41,12 @@ class AppState with ChangeNotifier {
 
   // Login user
   Future<bool> login(String email, String password) async {
-    setLoading(true);
-    
     try {
       _currentUser = await _apiService.login(email, password);
       await fetchInitialData();
-      setLoading(false);
       notifyListeners();
       return true;
     } catch (e) {
-      setLoading(false);
       notifyListeners();
       return false;
     }
@@ -58,16 +54,12 @@ class AppState with ChangeNotifier {
 
   // Register user
   Future<bool> register(String username, String email, String password) async {
-    setLoading(true);
-    
     try {
       _currentUser = await _apiService.register(username, email, password);
       await fetchInitialData();
-      setLoading(false);
       notifyListeners();
       return true;
     } catch (e) {
-      setLoading(false);
       notifyListeners();
       return false;
     }
