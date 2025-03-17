@@ -22,7 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     // Ensure data is loaded
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
       final appState = Provider.of<AppState>(context, listen: false);
       if (appState.books.isEmpty || appState.categories.isEmpty) {
         appState.fetchInitialData();

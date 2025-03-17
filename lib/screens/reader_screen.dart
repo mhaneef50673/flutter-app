@@ -22,7 +22,10 @@ class _ReaderScreenState extends State<ReaderScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _loadBookContent();
+    // Use Future.delayed to avoid calling setState during build
+    Future.delayed(Duration.zero, () {
+      _loadBookContent();
+    });
   }
 
   Future<void> _loadBookContent() async {

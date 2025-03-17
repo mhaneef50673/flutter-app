@@ -64,7 +64,7 @@ class ApiService {
     final response = await http.post(
       Uri.parse('$baseUrl/api/auth/register'),
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
+      body: jsonEncode(<String, String>{
         'username': username,
         'email': email,
         'password': password,
@@ -105,7 +105,7 @@ class ApiService {
     final response = await http.post(
       Uri.parse('$baseUrl/api/auth/login'),
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
+      body: jsonEncode(<String, String>{
         'email': email,
         'password': password,
       }),
@@ -431,7 +431,7 @@ class ApiService {
     final response = await http.post(
       Uri.parse('$baseUrl/api/bookmarks'),
       headers: headers,
-      body: jsonEncode({
+      body: jsonEncode(<String, dynamic>{
         'bookId': bookId,
         'pageNumber': pageNumber,
       }),

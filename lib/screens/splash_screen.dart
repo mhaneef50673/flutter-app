@@ -13,7 +13,10 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    _checkLoginStatus();
+    // Use Future.delayed to avoid calling setState during build
+    Future.delayed(Duration.zero, () {
+      _checkLoginStatus();
+    });
   }
 
   Future<void> _checkLoginStatus() async {

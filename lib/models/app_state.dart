@@ -35,7 +35,8 @@ class AppState with ChangeNotifier {
 
   // Check if user is logged in
   Future<bool> checkLoginStatus() async {
-    return await _apiService.isLoggedIn();
+    final bool isLoggedIn = await _apiService.isLoggedIn();
+    return isLoggedIn;
   }
 
   // Login user
