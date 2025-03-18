@@ -94,6 +94,7 @@ class BookCard extends StatelessWidget {
         margin: const EdgeInsets.only(right: 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min, // Add this to prevent expansion
           children: [
             Card(
               elevation: 4,
@@ -127,7 +128,7 @@ class BookCard extends StatelessWidget {
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
-              maxLines: 2,
+              maxLines: 1, // Limit to 1 line to prevent overflow
               overflow: TextOverflow.ellipsis,
             ),
             Text(

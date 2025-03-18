@@ -104,7 +104,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     const SizedBox(height: 16),
                     SizedBox(
-                      height: 240, // Increased height to avoid overflow
+                      height: 280, // Increased from 240 to prevent overflow
                       child: ListView.builder(
                         scrollDirection: Axis.horizontal,
                         itemCount: featuredBooks.length,
