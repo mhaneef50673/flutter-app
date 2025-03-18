@@ -18,6 +18,7 @@ class _ReaderScreenState extends State<ReaderScreen> {
   bool _showControls = true;
   List<BookPage> _pages = [];
   bool _isLoading = true;
+  double _fontSize = 18.0; // Default font size
 
   @override
   void didChangeDependencies() {
@@ -78,6 +79,12 @@ class _ReaderScreenState extends State<ReaderScreen> {
     await appState.toggleBookmarkForPage(book.id, currentPage.pageNumber);
   }
 
+  void _changeFontSize(double newSize) {
+    setState(() {
+      _fontSize = newSize;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final book = ModalRoute.of(context)!.settings.arguments as Book;
@@ -110,13 +117,45 @@ class _ReaderScreenState extends State<ReaderScreen> {
                       context: context,
                       builder: (ctx) => AlertDialog(
                         title: const Text('Adjust Font Size'),
-                        content: const Text('This feature is not implemented in the demo.'),
+                        content: StatefulBuilder(
+                          builder: (context, setDialogState) {
+                            return Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  'Sample Text',
+                                  style: TextStyle(fontSize: _fontSize),
+                                ),
+                                const SizedBox(height: 20),
+                                Slider(
+                                  value: _fontSize,
+                                  min: 12.0,
+                                  max: 32.0,
+                                  divisions: 10,
+                                  label: _fontSize.round().toString(),
+                                  onChanged: (value) {
+                                    setDialogState(() {
+                                      _fontSize = value;
+                                    });
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        ),
                         actions: [
                           TextButton(
                             onPressed: () {
                               Navigator.of(ctx).pop();
                             },
-                            child: const Text('OK'),
+                            child: const Text('Cancel'),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              _changeFontSize(_fontSize);
+                              Navigator.of(ctx).pop();
+                            },
+                            child: const Text('Apply'),
                           ),
                         ],
                       ),
@@ -135,16 +174,7 @@ class _ReaderScreenState extends State<ReaderScreen> {
               : GestureDetector(
                   onTap: _toggleControls,
                   child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      image: _pages[_currentPageIndex].imageUrl != null
-                          ? DecorationImage(
-                              image: NetworkImage(_pages[_currentPageIndex].imageUrl!),
-                              fit: BoxFit.cover,
-                              opacity: 0.3,
-                            )
-                          : null,
-                    ),
+                    color: Colors.white,
                     child: SafeArea(
                       child: Stack(
                         children: [
@@ -154,9 +184,10 @@ class _ReaderScreenState extends State<ReaderScreen> {
                               padding: const EdgeInsets.all(24),
                               child: Text(
                                 _pages[_currentPageIndex].text,
-                                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                      height: 1.5,
-                                    ),
+                                style: TextStyle(
+                                  fontSize: _fontSize,
+                                  height: 1.5,
+                                ),
                                 textAlign: TextAlign.center,
                               ),
                             ),

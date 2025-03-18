@@ -224,7 +224,7 @@ class ApiService {
     if (_isMockEnabled) {
       await Future.delayed(const Duration(seconds: 1)); // Simulate network delay
       
-      // Mock book pages based on book ID with better placeholder URLs
+      // Mock book pages based on book ID without background images
       if (bookId == 1) {
         return [
           BookPage(
@@ -232,56 +232,48 @@ class ApiService {
             bookId: 1,
             pageNumber: 1,
             text: 'Once upon a time, there was a little girl named Lucy who lived at the edge of a magical forest.',
-            imageUrl: 'https://picsum.photos/seed/page1/600/400',
           ),
           BookPage(
             id: 2,
             bookId: 1,
             pageNumber: 2,
             text: 'One day, Lucy decided to explore the forest despite her parents\' warnings.',
-            imageUrl: 'https://picsum.photos/seed/page2/600/400',
           ),
           BookPage(
             id: 3,
             bookId: 1,
             pageNumber: 3,
             text: 'As she walked deeper into the forest, the trees seemed to whisper her name.',
-            imageUrl: 'https://picsum.photos/seed/page3/600/400',
           ),
           BookPage(
             id: 4,
             bookId: 1,
             pageNumber: 4,
             text: 'Suddenly, she came across a talking rabbit who introduced himself as Mr. Whiskers.',
-            imageUrl: 'https://picsum.photos/seed/page4/600/400',
           ),
           BookPage(
             id: 5,
             bookId: 1,
             pageNumber: 5,
             text: 'Mr. Whiskers offered to guide Lucy through the magical forest.',
-            imageUrl: 'https://picsum.photos/seed/page5/600/400',
           ),
           BookPage(
             id: 6,
             bookId: 1,
             pageNumber: 6,
             text: 'They encountered many magical creatures and had wonderful adventures.',
-            imageUrl: 'https://picsum.photos/seed/page6/600/400',
           ),
           BookPage(
             id: 7,
             bookId: 1,
             pageNumber: 7,
             text: 'When it was time to go home, Lucy promised to visit her new friends again.',
-            imageUrl: 'https://picsum.photos/seed/page7/600/400',
           ),
           BookPage(
             id: 8,
             bookId: 1,
             pageNumber: 8,
             text: 'The End.',
-            imageUrl: 'https://picsum.photos/seed/page8/600/400',
           ),
         ];
       } else if (bookId == 2) {
@@ -291,14 +283,12 @@ class ApiService {
             bookId: 2,
             pageNumber: 1,
             text: 'In a land of dragons, a young dragon named Spark couldn\'t breathe fire.',
-            imageUrl: 'https://picsum.photos/seed/dragon1/600/400',
           ),
           BookPage(
             id: 10,
             bookId: 2,
             pageNumber: 2,
             text: 'All the other dragons could breathe magnificent flames, but not Spark.',
-            imageUrl: 'https://picsum.photos/seed/dragon2/600/400',
           ),
           // Add more pages for book 2
         ];
@@ -311,7 +301,6 @@ class ApiService {
             bookId: bookId,
             pageNumber: index + 1,
             text: 'This is page ${index + 1} of book $bookId.',
-            imageUrl: 'https://picsum.photos/seed/book${bookId}page${index+1}/600/400',
           ),
         );
       }
