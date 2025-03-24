@@ -1,10 +1,10 @@
 import 'package:flutter/foundation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/material.dart';
 import 'user.dart';
 import 'book.dart';
 import 'book_page.dart';
 import 'bookmark.dart';
-import 'category.dart' as app_models; // Use a prefix to avoid conflict
+import 'category.dart';
 import '../services/api_service.dart';
 
 class AppState with ChangeNotifier {
@@ -12,25 +12,20 @@ class AppState with ChangeNotifier {
   
   User? _currentUser;
   List<Book> _books = [];
-  List<app_models.Category> _categories = []; // Use the prefix
+  List<Category> _categories = [];
   List<Bookmark> _bookmarks = [];
   Map<int, List<BookPage>> _bookPages = {}; // Cache for book pages
   bool _isLoading = false;
 
   User? get currentUser => _currentUser;
   List<Book> get books => _books;
-  List<app_models.Category> get categories => _categories; // Use the prefix
+  List<Category> get categories => _categories;
   List<Bookmark> get bookmarks => _bookmarks;
   bool get isLoading => _isLoading;
 
   // Get books by category
   List<Book> getBooksByCategory(String category) {
     return _books.where((book) => book.category == category).toList();
-  }
-
-  // Get featured books
-  List<Book> get featuredBooks {
-    return _books.where((book) => book.isFeatured).toList();
   }
 
   // Check if user is logged in
@@ -40,9 +35,9 @@ class AppState with ChangeNotifier {
   }
 
   // Login user
-  Future<bool> login(String email, String password) async {
+  Future<bool> login(String username, String password) async {
     try {
-      _currentUser = await _apiService.login(email, password);
+      _currentUser = await _apiService.login(username, password);
       await fetchInitialData();
       notifyListeners();
       return true;
@@ -55,8 +50,9 @@ class AppState with ChangeNotifier {
   // Register user
   Future<bool> register(String username, String email, String password) async {
     try {
-      _currentUser = await _apiService.register(username, email, password);
-      await fetchInitialData();
+      final response = await _apiService.register(username, email, password);
+      // Show toast message
+      // The toast message will be shown in the UI where this method is called
       notifyListeners();
       return true;
     } catch (e) {
@@ -113,6 +109,22 @@ class AppState with ChangeNotifier {
     }
   }
 
+  // Fetch books by category
+  Future<List<Book>> fetchBooksByCategory(String category) async {
+    setLoading(true);
+    
+    try {
+      final books = await _apiService.getBooksByCategory(category);
+      setLoading(false);
+      notifyListeners();
+      return books;
+    } catch (e) {
+      setLoading(false);
+      notifyListeners();
+      return [];
+    }
+  }
+
   // Fetch book details
   Future<Book?> fetchBookDetails(int bookId) async {
     setLoading(true);
@@ -156,6 +168,38 @@ class AppState with ChangeNotifier {
     }
   }
 
+  // Fetch book content (single page)
+  Future<BookPage> fetchBookPage(int bookId, int pageNumber) async {
+    setLoading(true);
+    
+    try {
+      final page = await _apiService.getBookContent(bookId, pageNumber);
+      setLoading(false);
+      notifyListeners();
+      return page;
+    } catch (e) {
+      setLoading(false);
+      notifyListeners();
+      rethrow;
+    }
+  }
+
+  // Get total pages for a book
+  Future<int> fetchBookTotalPages(int bookId) async {
+    setLoading(true);
+    
+    try {
+      final totalPages = await _apiService.getBookTotalPages(bookId);
+      setLoading(false);
+      notifyListeners();
+      return totalPages;
+    } catch (e) {
+      setLoading(false);
+      notifyListeners();
+      return 0;
+    }
+  }
+
   // Fetch bookmarks
   Future<void> fetchBookmarks() async {
     setLoading(true);
@@ -192,8 +236,12 @@ class AppState with ChangeNotifier {
     setLoading(true);
     
     try {
-      await _apiService.removeBookmark(bookmarkId);
+      final response = await _apiService.removeBookmark(bookmarkId);
       _bookmarks.removeWhere((bookmark) => bookmark.id == bookmarkId);
+      
+      // Show toast message
+      // The toast message will be shown in the UI where this method is called
+      
       setLoading(false);
       notifyListeners();
       return true;

@@ -58,6 +58,12 @@ class ProfileScreen extends StatelessWidget {
                     child: ElevatedButton.icon(
                       onPressed: () {
                         appState.logout();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('You have been logged out'),
+                            backgroundColor: Colors.blue,
+                          ),
+                        );
                         Navigator.of(context).pushReplacementNamed('/login');
                       },
                       icon: const Icon(Icons.logout),

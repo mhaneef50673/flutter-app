@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import '../screens/home_screen.dart';
 import '../screens/bookmarks_screen.dart';
 import '../screens/profile_screen.dart';
-import '../models/category.dart' as app_models;
+import '../models/category.dart';
 import '../models/app_state.dart';
 
 class MainNavigation extends StatefulWidget {

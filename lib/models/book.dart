@@ -5,7 +5,6 @@ class Book {
   final String category;
   final String coverImageUrl;
   final String description;
-  final bool isFeatured; // Additional field for UI purposes
 
   Book({
     required this.id,
@@ -14,7 +13,6 @@ class Book {
     required this.category,
     required this.coverImageUrl,
     required this.description,
-    this.isFeatured = false,
   });
 
   factory Book.fromJson(Map<String, dynamic> json) {
@@ -25,7 +23,6 @@ class Book {
       category: json['category'],
       coverImageUrl: json['coverImageUrl'],
       description: json['description'],
-      isFeatured: json['isFeatured'] ?? false,
     );
   }
 }

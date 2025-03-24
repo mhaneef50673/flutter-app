@@ -14,9 +14,10 @@ class ReaderScreen extends StatefulWidget {
 }
 
 class _ReaderScreenState extends State<ReaderScreen> {
-  int _currentPageIndex = 0;
+  int _currentPageNumber = 1;
   bool _showControls = true;
-  List<BookPage> _pages = [];
+  BookPage? _currentPage;
+  int _totalPages = 0;
   bool _isLoading = true;
   double _fontSize = 18.0; // Default font size
 
@@ -25,11 +26,11 @@ class _ReaderScreenState extends State<ReaderScreen> {
     super.didChangeDependencies();
     // Use Future.delayed to avoid calling setState during build
     Future.delayed(Duration.zero, () {
-      _loadBookContent();
+      _initReader();
     });
   }
 
-  Future<void> _loadBookContent() async {
+  Future<void> _initReader() async {
     final book = ModalRoute.of(context)!.settings.arguments as Book;
     final appState = Provider.of<AppState>(context, listen: false);
     
@@ -37,13 +38,69 @@ class _ReaderScreenState extends State<ReaderScreen> {
       _isLoading = true;
     });
     
-    final pages = await appState.fetchBookContent(book.id);
+    try {
+      // Get total pages
+      final totalPages = await appState.fetchBookTotalPages(book.id);
+      
+      // Get first page
+      final page = await appState.fetchBookPage(book.id, _currentPageNumber);
+      
+      if (mounted) {
+        setState(() {
+          _totalPages = totalPages;
+          _currentPage = page;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error loading book: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _loadPage(int pageNumber) async {
+    if (pageNumber < 1 || pageNumber > _totalPages) return;
     
-    if (mounted) {
-      setState(() {
-        _pages = pages;
-        _isLoading = false;
-      });
+    final book = ModalRoute.of(context)!.settings.arguments as Book;
+    final appState = Provider.of<AppState>(context, listen: false);
+    
+    setState(() {
+      _isLoading = true;
+    });
+    
+    try {
+      final page = await appState.fetchBookPage(book.id, pageNumber);
+      
+      if (mounted) {
+        setState(() {
+          _currentPageNumber = pageNumber;
+          _currentPage = page;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error loading page: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
@@ -54,29 +111,37 @@ class _ReaderScreenState extends State<ReaderScreen> {
   }
 
   void _goToNextPage() {
-    if (_currentPageIndex < _pages.length - 1) {
-      setState(() {
-        _currentPageIndex++;
-      });
+    if (_currentPageNumber < _totalPages) {
+      _loadPage(_currentPageNumber + 1);
     }
   }
 
   void _goToPreviousPage() {
-    if (_currentPageIndex > 0) {
-      setState(() {
-        _currentPageIndex--;
-      });
+    if (_currentPageNumber > 1) {
+      _loadPage(_currentPageNumber - 1);
     }
   }
 
   void _toggleBookmark() async {
-    if (_pages.isEmpty) return;
+    if (_currentPage == null) return;
     
     final book = ModalRoute.of(context)!.settings.arguments as Book;
     final appState = Provider.of<AppState>(context, listen: false);
-    final currentPage = _pages[_currentPageIndex];
     
-    await appState.toggleBookmarkForPage(book.id, currentPage.pageNumber);
+    final success = await appState.toggleBookmarkForPage(book.id, _currentPageNumber);
+    
+    if (success && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            appState.isPageBookmarked(book.id, _currentPageNumber)
+                ? 'Bookmark added'
+                : 'Bookmark removed'
+          ),
+          backgroundColor: Colors.green,
+        ),
+      );
+    }
   }
 
   void _changeFontSize(double newSize) {
@@ -90,11 +155,11 @@ class _ReaderScreenState extends State<ReaderScreen> {
     final book = ModalRoute.of(context)!.settings.arguments as Book;
     final appState = Provider.of<AppState>(context);
     
-    final hasNextPage = _currentPageIndex < _pages.length - 1;
-    final hasPreviousPage = _currentPageIndex > 0;
+    final hasNextPage = _currentPageNumber < _totalPages;
+    final hasPreviousPage = _currentPageNumber > 1;
     
-    final isCurrentPageBookmarked = _pages.isNotEmpty 
-        ? appState.isPageBookmarked(book.id, _pages[_currentPageIndex].pageNumber)
+    final isCurrentPageBookmarked = _currentPage != null 
+        ? appState.isPageBookmarked(book.id, _currentPageNumber)
         : false;
 
     return Scaffold(
@@ -167,9 +232,9 @@ class _ReaderScreenState extends State<ReaderScreen> {
           : null,
       body: _isLoading
           ? const LoadingIndicator(message: 'Loading book...')
-          : _pages.isEmpty
+          : _currentPage == null
               ? const Center(
-                  child: Text('No pages found for this book.'),
+                  child: Text('No content found for this book.'),
                 )
               : GestureDetector(
                   onTap: _toggleControls,
@@ -183,7 +248,7 @@ class _ReaderScreenState extends State<ReaderScreen> {
                             child: Padding(
                               padding: const EdgeInsets.all(24),
                               child: Text(
-                                _pages[_currentPageIndex].text,
+                                _currentPage!.text,
                                 style: TextStyle(
                                   fontSize: _fontSize,
                                   height: 1.5,
@@ -208,7 +273,7 @@ class _ReaderScreenState extends State<ReaderScreen> {
                                   borderRadius: BorderRadius.circular(20),
                                 ),
                                 child: Text(
-                                  'Page ${_currentPageIndex + 1} of ${_pages.length}',
+                                  'Page $_currentPageNumber of $_totalPages',
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,

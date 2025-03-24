@@ -6,11 +6,13 @@ import '../models/user.dart';
 import '../models/book.dart';
 import '../models/book_page.dart';
 import '../models/bookmark.dart';
-import '../models/category.dart' as app_models;
+import '../models/category.dart';
 
 class ApiService {
-  static const String baseUrl = 'https://api.example.com'; // Mock base URL
+  // API base URL - would be the real URL in production
+  static const String baseUrl = 'https://localhost:7147/api';
   static const String tokenKey = 'auth_token';
+  static const String userIdKey = 'user_id';
   
   // For mock implementation
   bool _isMockEnabled = true;
@@ -31,11 +33,24 @@ class ApiService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(tokenKey, token);
   }
+
+  // Save userId to shared preferences
+  Future<void> _saveUserId(String userId) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(userIdKey, userId);
+  }
+  
+  // Get userId from shared preferences
+  Future<String?> getUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(userIdKey);
+  }
   
   // Clear token from shared preferences
   Future<void> clearToken() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(tokenKey);
+    await prefs.remove(userIdKey);
   }
   
   // Check if user is logged in
@@ -45,26 +60,20 @@ class ApiService {
   }
   
   // Register user
-  Future<User> register(String username, String email, String password) async {
+  Future<Map<String, dynamic>> register(String username, String email, String password) async {
     if (_isMockEnabled) {
       await Future.delayed(const Duration(seconds: 2)); // Simulate network delay
       
       // Mock successful registration
-      final user = User(
-        id: 1,
-        username: username,
-        email: email,
-        token: 'mock_jwt_token_${DateTime.now().millisecondsSinceEpoch}',
-      );
-      
-      await _saveToken(user.token);
-      return user;
+      return {
+        'message': 'User registered successfully'
+      };
     }
     
     final response = await http.post(
-      Uri.parse('$baseUrl/api/auth/register'),
+      Uri.parse('$baseUrl/Auth/register'),
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode(<String, String>{
+      body: jsonEncode({
         'username': username,
         'email': email,
         'password': password,
@@ -72,50 +81,59 @@ class ApiService {
     );
     
     if (response.statusCode == 200 || response.statusCode == 201) {
-      final data = jsonDecode(response.body);
-      final user = User.fromJson(data);
-      await _saveToken(user.token);
-      return user;
+      return jsonDecode(response.body);
     } else {
       throw Exception('Failed to register: ${response.body}');
     }
   }
   
   // Login user
-  Future<User> login(String email, String password) async {
+  Future<User> login(String username, String password) async {
     if (_isMockEnabled) {
       await Future.delayed(const Duration(seconds: 2)); // Simulate network delay
       
       // Mock login validation
-      if (email == 'test@example.com' && password == 'password') {
-        final user = User(
-          id: 1,
-          username: 'testuser',
-          email: email,
-          token: 'mock_jwt_token_${DateTime.now().millisecondsSinceEpoch}',
-        );
+      if (username == 'test' && password == 'password') {
+        final userId = '1';
+        final token = 'mock_jwt_token_${DateTime.now().millisecondsSinceEpoch}';
         
-        await _saveToken(user.token);
-        return user;
+        await _saveToken(token);
+        await _saveUserId(userId);
+        
+        return User(
+          id: int.parse(userId),
+          username: username,
+          email: 'test@example.com',
+          token: token,
+        );
       } else {
         throw Exception('Invalid credentials');
       }
     }
     
     final response = await http.post(
-      Uri.parse('$baseUrl/api/auth/login'),
+      Uri.parse('$baseUrl/Auth/login'),
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode(<String, String>{
-        'email': email,
+      body: jsonEncode({
+        'username': username,
         'password': password,
       }),
     );
     
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      final user = User.fromJson(data);
-      await _saveToken(user.token);
-      return user;
+      final userId = data['userId'];
+      final token = data['token'];
+      
+      await _saveToken(token);
+      await _saveUserId(userId);
+      
+      return User(
+        id: int.parse(userId),
+        username: username,
+        email: '', // Email not returned from API
+        token: token,
+      );
     } else {
       throw Exception('Failed to login: ${response.body}');
     }
@@ -126,25 +144,23 @@ class ApiService {
     if (_isMockEnabled) {
       await Future.delayed(const Duration(seconds: 2)); // Simulate network delay
       
-      // Mock books data with better placeholder URLs
+      // Mock books data matching API response format
       return [
         Book(
           id: 1,
           title: 'The Magic Forest',
           author: 'Jane Smith',
-          category: 'Adventure',
+          category: 'Fiction',
           coverImageUrl: 'https://picsum.photos/seed/book1/300/450',
           description: 'Join Lucy on her adventure through the magical forest where she meets talking animals and discovers hidden treasures.',
-          isFeatured: true,
         ),
         Book(
           id: 2,
           title: 'Dragon\'s Tale',
           author: 'Michael Johnson',
-          category: 'Fantasy',
+          category: 'Fiction',
           coverImageUrl: 'https://picsum.photos/seed/book2/300/450',
           description: 'A young dragon learns to breathe fire and finds his place in the dragon community.',
-          isFeatured: true,
         ),
         Book(
           id: 3,
@@ -153,7 +169,6 @@ class ApiService {
           category: 'Animals',
           coverImageUrl: 'https://picsum.photos/seed/book3/300/450',
           description: 'Fluffy the cat gets lost in the big city and must find his way back home.',
-          isFeatured: false,
         ),
         Book(
           id: 4,
@@ -162,7 +177,6 @@ class ApiService {
           category: 'Bedtime',
           coverImageUrl: 'https://picsum.photos/seed/book4/300/450',
           description: 'Teddy the bear doesn\'t want to go to sleep and comes up with many excuses to stay awake.',
-          isFeatured: false,
         ),
         Book(
           id: 5,
@@ -171,14 +185,13 @@ class ApiService {
           category: 'Educational',
           coverImageUrl: 'https://picsum.photos/seed/book5/300/450',
           description: 'Learn to count from 1 to 10 with the help of playful monkeys.',
-          isFeatured: true,
         ),
       ];
     }
     
     final headers = await _getHeaders();
     final response = await http.get(
-      Uri.parse('$baseUrl/api/books'),
+      Uri.parse('$baseUrl/books'),
       headers: headers,
     );
     
@@ -187,6 +200,30 @@ class ApiService {
       return data.map((json) => Book.fromJson(json)).toList();
     } else {
       throw Exception('Failed to load books: ${response.body}');
+    }
+  }
+  
+  // Get books by category
+  Future<List<Book>> getBooksByCategory(String category) async {
+    if (_isMockEnabled) {
+      await Future.delayed(const Duration(seconds: 1)); // Simulate network delay
+      
+      // Filter mock books by category
+      final allBooks = await getBooks();
+      return allBooks.where((book) => book.category == category).toList();
+    }
+    
+    final headers = await _getHeaders();
+    final response = await http.get(
+      Uri.parse('$baseUrl/books/category?category=$category'),
+      headers: headers,
+    );
+    
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(response.body);
+      return data.map((json) => Book.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load books by category: ${response.body}');
     }
   }
   
@@ -207,7 +244,7 @@ class ApiService {
     
     final headers = await _getHeaders();
     final response = await http.get(
-      Uri.parse('$baseUrl/api/books/$bookId'),
+      Uri.parse('$baseUrl/books/$bookId'),
       headers: headers,
     );
     
@@ -220,130 +257,121 @@ class ApiService {
   }
   
   // Get book content (pages)
-  Future<List<BookPage>> getBookContent(int bookId) async {
+  Future<BookPage> getBookContent(int bookId, int pageNumber) async {
     if (_isMockEnabled) {
-      await Future.delayed(const Duration(seconds: 1)); // Simulate network delay
+      await Future.delayed(const Duration(milliseconds: 500)); // Simulate network delay
       
-      // Mock book pages based on book ID without background images
+      // Mock book pages based on book ID and page number
+      String content = '';
+      
       if (bookId == 1) {
-        return [
-          BookPage(
-            id: 1,
-            bookId: 1,
-            pageNumber: 1,
-            text: 'Once upon a time, there was a little girl named Lucy who lived at the edge of a magical forest.',
-          ),
-          BookPage(
-            id: 2,
-            bookId: 1,
-            pageNumber: 2,
-            text: 'One day, Lucy decided to explore the forest despite her parents\' warnings.',
-          ),
-          BookPage(
-            id: 3,
-            bookId: 1,
-            pageNumber: 3,
-            text: 'As she walked deeper into the forest, the trees seemed to whisper her name.',
-          ),
-          BookPage(
-            id: 4,
-            bookId: 1,
-            pageNumber: 4,
-            text: 'Suddenly, she came across a talking rabbit who introduced himself as Mr. Whiskers.',
-          ),
-          BookPage(
-            id: 5,
-            bookId: 1,
-            pageNumber: 5,
-            text: 'Mr. Whiskers offered to guide Lucy through the magical forest.',
-          ),
-          BookPage(
-            id: 6,
-            bookId: 1,
-            pageNumber: 6,
-            text: 'They encountered many magical creatures and had wonderful adventures.',
-          ),
-          BookPage(
-            id: 7,
-            bookId: 1,
-            pageNumber: 7,
-            text: 'When it was time to go home, Lucy promised to visit her new friends again.',
-          ),
-          BookPage(
-            id: 8,
-            bookId: 1,
-            pageNumber: 8,
-            text: 'The End.',
-          ),
-        ];
+        switch (pageNumber) {
+          case 1:
+            content = 'Once upon a time, there was a little girl named Lucy who lived at the edge of a magical forest.';
+            break;
+          case 2:
+            content = 'One day, Lucy decided to explore the forest despite her parents\' warnings.';
+            break;
+          case 3:
+            content = 'As she walked deeper into the forest, the trees seemed to whisper her name.';
+            break;
+          case 4:
+            content = 'Suddenly, she came across a talking rabbit who introduced himself as Mr. Whiskers.';
+            break;
+          case 5:
+            content = 'Mr. Whiskers offered to guide Lucy through the magical forest.';
+            break;
+          case 6:
+            content = 'They encountered many magical creatures and had wonderful adventures.';
+            break;
+          case 7:
+            content = 'When it was time to go home, Lucy promised to visit her new friends again.';
+            break;
+          case 8:
+            content = 'The End.';
+            break;
+          default:
+            content = 'Page not found.';
+        }
       } else if (bookId == 2) {
-        return [
-          BookPage(
-            id: 9,
-            bookId: 2,
-            pageNumber: 1,
-            text: 'In a land of dragons, a young dragon named Spark couldn\'t breathe fire.',
-          ),
-          BookPage(
-            id: 10,
-            bookId: 2,
-            pageNumber: 2,
-            text: 'All the other dragons could breathe magnificent flames, but not Spark.',
-          ),
-          // Add more pages for book 2
-        ];
+        switch (pageNumber) {
+          case 1:
+            content = 'In a land of dragons, a young dragon named Spark couldn\'t breathe fire.';
+            break;
+          case 2:
+            content = 'All the other dragons could breathe magnificent flames, but not Spark.';
+            break;
+          default:
+            content = 'This is page $pageNumber of book $bookId.';
+        }
       } else {
-        // Generate generic pages for other books
-        return List.generate(
-          8,
-          (index) => BookPage(
-            id: 100 + (bookId * 10) + index,
-            bookId: bookId,
-            pageNumber: index + 1,
-            text: 'This is page ${index + 1} of book $bookId.',
-          ),
-        );
+        // Generate generic content for other books
+        content = 'This is page $pageNumber of book $bookId.';
       }
+      
+      return BookPage(
+        pageNumber: pageNumber,
+        text: content,
+      );
     }
     
     final headers = await _getHeaders();
     final response = await http.get(
-      Uri.parse('$baseUrl/api/books/$bookId/content'),
+      Uri.parse('$baseUrl/books/$bookId/content?page=$pageNumber'),
       headers: headers,
     );
     
     if (response.statusCode == 200) {
-      final List<dynamic> data = jsonDecode(response.body);
-      return data.map((json) => BookPage.fromJson(json)).toList();
+      final data = jsonDecode(response.body);
+      return BookPage.fromJson(data, pageNumber);
     } else {
       throw Exception('Failed to load book content: ${response.body}');
     }
   }
   
+  // Get total pages for a book
+  Future<int> getBookTotalPages(int bookId) async {
+    if (_isMockEnabled) {
+      // Mock total pages based on book ID
+      switch (bookId) {
+        case 1:
+          return 8;
+        case 2:
+          return 6;
+        default:
+          return 5;
+      }
+    }
+    
+    // In a real implementation, we would fetch this from the API
+    // For now, we'll use the mock implementation
+    throw Exception('API endpoint not implemented');
+  }
+  
   // Get categories
-  Future<List<app_models.Category>> getCategories() async {
+  Future<List<Category>> getCategories() async {
     if (_isMockEnabled) {
       await Future.delayed(const Duration(seconds: 1)); // Simulate network delay
       
-      // Mock categories data
+      // Mock categories data matching API response format
       return [
-        app_models.Category(name: 'Adventure', color: 0xFFFF9800),
-        app_models.Category(name: 'Fantasy', color: 0xFF4CAF50),
-        app_models.Category(name: 'Animals', color: 0xFF2196F3),
-        app_models.Category(name: 'Bedtime', color: 0xFF9C27B0),
-        app_models.Category(name: 'Educational', color: 0xFFE91E63),
+        Category(id: 1, name: 'Fiction', color: 0xFFFF9800),
+        Category(id: 2, name: 'Science', color: 0xFF4CAF50),
+        Category(id: 3, name: 'Animals', color: 0xFF2196F3),
+        Category(id: 4, name: 'Bedtime', color: 0xFF9C27B0),
+        Category(id: 5, name: 'Educational', color: 0xFFE91E63),
       ];
     }
     
     final headers = await _getHeaders();
     final response = await http.get(
-      Uri.parse('$baseUrl/api/books/categories'),
+      Uri.parse('$baseUrl/books/categories'),
       headers: headers,
     );
     
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
-      return data.map((json) => app_models.Category.fromJson(json)).toList();
+      return data.map((json) => Category.fromJson(json)).toList();
     } else {
       throw Exception('Failed to load categories: ${response.body}');
     }
@@ -354,18 +382,24 @@ class ApiService {
     if (_isMockEnabled) {
       await Future.delayed(const Duration(seconds: 1)); // Simulate network delay
       
-      // Mock bookmarks data
+      // Get userId
+      final userId = await getUserId();
+      if (userId == null) {
+        throw Exception('User not logged in');
+      }
+      
+      // Mock bookmarks data matching API response format
       final List<Bookmark> bookmarks = [
         Bookmark(
           id: 1,
-          userId: 1,
+          userId: int.parse(userId),
           bookId: 1,
           pageNumber: 3,
           createdAt: DateTime.now().subtract(const Duration(days: 2)),
         ),
         Bookmark(
           id: 2,
-          userId: 1,
+          userId: int.parse(userId),
           bookId: 3,
           pageNumber: 1,
           createdAt: DateTime.now().subtract(const Duration(days: 1)),
@@ -381,9 +415,14 @@ class ApiService {
       return bookmarks;
     }
     
+    final userId = await getUserId();
+    if (userId == null) {
+      throw Exception('User not logged in');
+    }
+    
     final headers = await _getHeaders();
     final response = await http.get(
-      Uri.parse('$baseUrl/api/bookmarks'),
+      Uri.parse('$baseUrl/bookmarks/user/$userId'),
       headers: headers,
     );
     
@@ -400,10 +439,16 @@ class ApiService {
     if (_isMockEnabled) {
       await Future.delayed(const Duration(seconds: 1)); // Simulate network delay
       
+      // Get userId
+      final userId = await getUserId();
+      if (userId == null) {
+        throw Exception('User not logged in');
+      }
+      
       // Mock adding a bookmark
       final bookmark = Bookmark(
         id: DateTime.now().millisecondsSinceEpoch,
-        userId: 1,
+        userId: int.parse(userId),
         bookId: bookId,
         pageNumber: pageNumber,
         createdAt: DateTime.now(),
@@ -416,11 +461,17 @@ class ApiService {
       return bookmark;
     }
     
+    final userId = await getUserId();
+    if (userId == null) {
+      throw Exception('User not logged in');
+    }
+    
     final headers = await _getHeaders();
     final response = await http.post(
-      Uri.parse('$baseUrl/api/bookmarks'),
+      Uri.parse('$baseUrl/bookmarks'),
       headers: headers,
-      body: jsonEncode(<String, dynamic>{
+      body: jsonEncode({
+        'userId': userId,
         'bookId': bookId,
         'pageNumber': pageNumber,
       }),
@@ -435,19 +486,24 @@ class ApiService {
   }
   
   // Remove bookmark
-  Future<void> removeBookmark(int bookmarkId) async {
+  Future<Map<String, dynamic>> removeBookmark(int bookmarkId) async {
     if (_isMockEnabled) {
       await Future.delayed(const Duration(seconds: 1)); // Simulate network delay
-      return; // Mock successful deletion
+      // Mock successful deletion
+      return {
+        'message': 'Bookmark deleted successfully'
+      };
     }
     
     final headers = await _getHeaders();
     final response = await http.delete(
-      Uri.parse('$baseUrl/api/bookmarks/$bookmarkId'),
+      Uri.parse('$baseUrl/bookmarks/user/$bookmarkId'),
       headers: headers,
     );
     
-    if (response.statusCode != 200 && response.statusCode != 204) {
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
       throw Exception('Failed to remove bookmark: ${response.body}');
     }
   }

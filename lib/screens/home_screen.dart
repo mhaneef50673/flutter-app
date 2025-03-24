@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/app_state.dart';
 import '../models/book.dart';
-import '../models/category.dart' as app_models;
+import '../models/category.dart';
 import '../widgets/book_card.dart';
 import '../widgets/category_card.dart';
 import '../widgets/loading_indicator.dart';
@@ -34,7 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _openCategoryBooks(app_models.Category category) {
+  void _openCategoryBooks(Category category) {
     Navigator.of(context).pushNamed(
       '/book-list',
       arguments: category,
@@ -46,7 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final appState = Provider.of<AppState>(context);
     final user = appState.currentUser;
     final isLoading = appState.isLoading;
-    final featuredBooks = appState.featuredBooks;
+    final books = appState.books;
     final categories = appState.categories;
 
     return Scaffold(
@@ -97,28 +97,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     const SizedBox(height: 24),
                     Text(
-                      'Featured Books',
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                    ),
-                    const SizedBox(height: 16),
-                    SizedBox(
-                      height: 280, // Increased from 240 to prevent overflow
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: featuredBooks.length,
-                        itemBuilder: (ctx, index) {
-                          return BookCard(
-                            book: featuredBooks[index],
-                            onTap: () => _openBookDetails(featuredBooks[index]),
-                            isCompact: true,
-                          );
-                        },
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    Text(
                       'Recently Added',
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
                             fontWeight: FontWeight.bold,
@@ -134,11 +112,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         crossAxisSpacing: 10,
                         mainAxisSpacing: 10,
                       ),
-                      itemCount: appState.books.length > 4 ? 4 : appState.books.length,
+                      itemCount: books.length > 4 ? 4 : books.length,
                       itemBuilder: (ctx, index) {
                         return BookCard(
-                          book: appState.books[index],
-                          onTap: () => _openBookDetails(appState.books[index]),
+                          book: books[index],
+                          onTap: () => _openBookDetails(books[index]),
                         );
                       },
                     ),
