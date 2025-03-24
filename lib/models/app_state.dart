@@ -5,6 +5,7 @@ import 'book.dart';
 import 'book_page.dart';
 import 'bookmark.dart';
 import 'category.dart' as app_models; // Use prefix to avoid naming conflict
+import '../services/api_service.dart'; // Add this import for ApiService
 
 class AppState with ChangeNotifier {
   final ApiService _apiService = ApiService();

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../models/app_state.dart';
 import '../models/book.dart';
 import '../widgets/loading_indicator.dart';
+// No Category import needed here
 
 class BookmarksScreen extends StatefulWidget {
   const BookmarksScreen({super.key});

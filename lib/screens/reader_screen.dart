@@ -5,6 +5,7 @@ import '../models/book.dart';
 import '../models/book_page.dart';
 import '../widgets/page_turn_button.dart';
 import '../widgets/loading_indicator.dart';
+// No Category import needed here
 
 class ReaderScreen extends StatefulWidget {
   const ReaderScreen({super.key});

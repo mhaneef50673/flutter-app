@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/book.dart';
+// No Category import needed here
 
 class BookCard extends StatelessWidget {
   final Book book;
