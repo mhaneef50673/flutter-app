@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/app_state.dart';
 import '../models/book.dart';
-import '../models/category.dart';
+import '../models/category.dart' as app_models; // Use prefix to avoid naming conflict
 import '../widgets/book_card.dart';
 import '../widgets/loading_indicator.dart';
 
@@ -24,7 +24,7 @@ class _BookListScreenState extends State<BookListScreen> {
   }
 
   Future<void> _loadBooks() async {
-    final category = ModalRoute.of(context)!.settings.arguments as Category;
+    final category = ModalRoute.of(context)!.settings.arguments as app_models.Category;
     final appState = Provider.of<AppState>(context, listen: false);
     
     setState(() {
@@ -65,7 +65,7 @@ class _BookListScreenState extends State<BookListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final category = ModalRoute.of(context)!.settings.arguments as Category;
+    final category = ModalRoute.of(context)!.settings.arguments as app_models.Category;
 
     return Scaffold(
       appBar: AppBar(

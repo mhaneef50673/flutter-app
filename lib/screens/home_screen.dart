@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/app_state.dart';
 import '../models/book.dart';
-import '../models/category.dart';
+import '../models/category.dart' as app_models; // Use prefix to avoid naming conflict
 import '../widgets/book_card.dart';
 import '../widgets/category_card.dart';
 import '../widgets/loading_indicator.dart';
@@ -34,7 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _openCategoryBooks(Category category) {
+  void _openCategoryBooks(app_models.Category category) {
     Navigator.of(context).pushNamed(
       '/book-list',
       arguments: category,

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../models/category.dart';
+import '../models/category.dart' as app_models; // Use prefix to avoid naming conflict
 
 class CategoryCard extends StatelessWidget {
-  final Category category;
+  final app_models.Category category;
   final VoidCallback onTap;
 
   const CategoryCard({

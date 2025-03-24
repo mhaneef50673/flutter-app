@@ -4,22 +4,21 @@ import 'user.dart';
 import 'book.dart';
 import 'book_page.dart';
 import 'bookmark.dart';
-import 'category.dart';
-import '../services/api_service.dart';
+import 'category.dart' as app_models; // Use prefix to avoid naming conflict
 
 class AppState with ChangeNotifier {
   final ApiService _apiService = ApiService();
   
   User? _currentUser;
   List<Book> _books = [];
-  List<Category> _categories = [];
+  List<app_models.Category> _categories = []; // Use the prefix
   List<Bookmark> _bookmarks = [];
   Map<int, List<BookPage>> _bookPages = {}; // Cache for book pages
   bool _isLoading = false;
 
   User? get currentUser => _currentUser;
   List<Book> get books => _books;
-  List<Category> get categories => _categories;
+  List<app_models.Category> get categories => _categories; // Use the prefix
   List<Bookmark> get bookmarks => _bookmarks;
   bool get isLoading => _isLoading;
 
@@ -51,7 +50,6 @@ class AppState with ChangeNotifier {
   Future<bool> register(String username, String email, String password) async {
     try {
       final response = await _apiService.register(username, email, password);
-      // Show toast message
       // The toast message will be shown in the UI where this method is called
       notifyListeners();
       return true;
@@ -141,7 +139,7 @@ class AppState with ChangeNotifier {
     }
   }
 
-  // Fetch book content (pages)
+  // Fetch book content (all pages)
   Future<List<BookPage>> fetchBookContent(int bookId) async {
     setLoading(true);
     
@@ -152,8 +150,15 @@ class AppState with ChangeNotifier {
         return _bookPages[bookId]!;
       }
       
-      // Fetch pages from API
-      final pages = await _apiService.getBookContent(bookId);
+      // Get total pages
+      final totalPages = await _apiService.getBookTotalPages(bookId);
+      
+      // Fetch all pages one by one
+      List<BookPage> pages = [];
+      for (int i = 1; i <= totalPages; i++) {
+        final page = await _apiService.getBookContent(bookId, i);
+        pages.add(page);
+      }
       
       // Cache the pages
       _bookPages[bookId] = pages;
@@ -239,7 +244,6 @@ class AppState with ChangeNotifier {
       final response = await _apiService.removeBookmark(bookmarkId);
       _bookmarks.removeWhere((bookmark) => bookmark.id == bookmarkId);
       
-      // Show toast message
       // The toast message will be shown in the UI where this method is called
       
       setLoading(false);
