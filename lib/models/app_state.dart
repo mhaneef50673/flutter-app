@@ -4,22 +4,22 @@ import 'user.dart';
 import 'book.dart';
 import 'book_page.dart';
 import 'bookmark.dart';
-import 'category.dart' as app_models; // Use prefix to avoid naming conflict
-import '../services/api_service.dart'; // Add this import for ApiService
+import 'category.dart' as app_models;
+import '../services/api_service.dart';
 
 class AppState with ChangeNotifier {
   final ApiService _apiService = ApiService();
   
   User? _currentUser;
   List<Book> _books = [];
-  List<app_models.Category> _categories = []; // Use the prefix
+  List<app_models.Category> _categories = [];
   List<Bookmark> _bookmarks = [];
   Map<int, List<BookPage>> _bookPages = {}; // Cache for book pages
   bool _isLoading = false;
 
   User? get currentUser => _currentUser;
   List<Book> get books => _books;
-  List<app_models.Category> get categories => _categories; // Use the prefix
+  List<app_models.Category> get categories => _categories;
   List<Bookmark> get bookmarks => _bookmarks;
   bool get isLoading => _isLoading;
 
@@ -50,8 +50,7 @@ class AppState with ChangeNotifier {
   // Register user
   Future<bool> register(String username, String email, String password) async {
     try {
-      final response = await _apiService.register(username, email, password);
-      // The toast message will be shown in the UI where this method is called
+      await _apiService.register(username, email, password);
       notifyListeners();
       return true;
     } catch (e) {
@@ -242,10 +241,8 @@ class AppState with ChangeNotifier {
     setLoading(true);
     
     try {
-      final response = await _apiService.removeBookmark(bookmarkId);
+      await _apiService.removeBookmark(bookmarkId);
       _bookmarks.removeWhere((bookmark) => bookmark.id == bookmarkId);
-      
-      // The toast message will be shown in the UI where this method is called
       
       setLoading(false);
       notifyListeners();
